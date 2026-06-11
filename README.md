@@ -24,6 +24,8 @@ A compiler for a custom imperative programming language written in C++.
 ## Build
 
 g++ -std=c++17 -Wall -Wextra -Iinclude src/*.cpp -o compiler
+or
+./build.sh
 
 ## Example
 
