@@ -1,0 +1,62 @@
+function int add(int a, int b)
+{
+return a + b;
+}
+
+function int max(int a, int b)
+{
+if (a > b)
+{
+return a;
+}
+
+
+return b;
+
+
+}
+
+start
+{
+int x = -10;
+int y = 20;
+int a = -x;
+int z;
+
+1||0;
+1&&0;
+
+z = add(x, y);
+
+x += 5;
+y -= 2;
+
+++x;
+--y;
+
+if (!(x < y))
+{
+    z = max(x, y);
+}
+
+while (x > 0)
+{
+    --x;
+}
+
+for (int i = 0; i < 10; ++i)
+{
+    z = z + i;
+}
+
+z = (x + y) * 2;
+
+z = add(
+        max(1, 2),
+        add(3, 4)
+    );
+
+return z;
+
+
+}
