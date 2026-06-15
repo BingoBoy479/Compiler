@@ -54,14 +54,9 @@ int main(int argc, char* argv[])
 
     while(!parser.isAtEnd())
     {
-        auto expr = parser.parseExpression();
+        auto expr = parser.parseStatement();
 
         printAST(expr.get());
-
-        parser.consume(
-            Semicolon,
-            "Expected ';'"
-        );
     }
     return 0;
 }

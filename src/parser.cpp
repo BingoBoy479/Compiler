@@ -350,3 +350,25 @@ unique_ptr<ExprNode> Parser::parseExpression(bool stopAtRightParen)
     operands.pop();
     return res;
 };
+
+unique_ptr<StmtNode> Parser::parseStatement()
+{
+    if(match(KwReturn))
+    {
+        auto res = parseExpression();
+        consume(
+            Semicolon,
+            "Expected ';'"
+        );
+        return make_unique<ReturnStmt>(move(res));
+    }
+
+        auto res = parseExpression();
+        consume(
+            Semicolon,
+            "Expected ';'"
+        );
+        return make_unique<ExprStmt>(move(res));
+
+
+}
