@@ -61,4 +61,24 @@ void printAST(const AstNode* node, int depth)
         printAST(a->lhs.get(), depth + 1);
         printAST(a->rhs.get(), depth + 1);
     }
+    else if(auto e = dynamic_cast<const ExprStmt*>(node))
+    {
+        indent(depth);
+        cout << "ExprStmt\n";
+
+        printAST(
+            e->expression.get(),
+            depth + 1
+        );
+    }
+    else if(auto r = dynamic_cast<const ReturnStmt*>(node))
+    {
+        indent(depth);
+        cout << "ReturnStmt\n";
+
+        printAST(
+            r->value.get(),
+            depth + 1
+        );
+    }
 }
