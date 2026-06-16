@@ -362,13 +362,14 @@ unique_ptr<StmtNode> Parser::parseStatement()
         );
         return make_unique<ReturnStmt>(move(res));
     }
-
+    else
+    {
         auto res = parseExpression();
         consume(
             Semicolon,
             "Expected ';'"
         );
         return make_unique<ExprStmt>(move(res));
-
+    }
 
 }
