@@ -350,6 +350,24 @@ unique_ptr<ExprNode> Parser::parseExpression(bool stopAtRightParen)
     operands.pop();
     return res;
 };
+unique_ptr<StmtNode> Parser::parseIf()
+{
+    consume(LeftParen,"Expected ( to start condition ");
+    auto condition = parseExpression();
+    consume(RightParen,"Expected ) to end condition ");
+
+    auto body = parseStatement();
+    auto node = std::make_unique<IfStmt>();
+
+    node->condition = std::move(condition);
+    node->thenBranch = std::move(body);
+    if(match(KwElse))
+    {
+        node->elseBranch = parseStatement();
+    }
+
+    return node;
+};
 
 unique_ptr<StmtNode> Parser::parseStatement()
 {
@@ -361,6 +379,23 @@ unique_ptr<StmtNode> Parser::parseStatement()
             "Expected ';'"
         );
         return make_unique<ReturnStmt>(move(res));
+    }
+    else if(match(KwIf))
+    {
+        return parseIf();
+    }
+    else if (match(LeftBrace))
+    {
+        auto block =
+        std::make_unique<BlockStmt>();
+
+        while(!check(RightBrace) && !isAtEnd())
+        {
+            block->statements.push_back( parseStatement() );
+        }
+        consume(RightBrace,"Expected '}' ");
+
+        return block;
     }
     else
     {

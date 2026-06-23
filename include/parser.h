@@ -44,9 +44,9 @@ private:
     bool check(TokenType type) const;
     bool match(TokenType type);
 
-    
+    std::unique_ptr<WhileStmt> parseWhile();
     std::unique_ptr<ExprNode> parseCallExpression();
-    
+    std::unique_ptr<StmtNode> parseIf();  
 
 
 };
