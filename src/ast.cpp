@@ -81,4 +81,54 @@ void printAST(const AstNode* node, int depth)
             depth + 1
         );
     }
+    else if(auto b = dynamic_cast<const BlockStmt*>(node))
+    {
+        indent(depth);
+        cout << "BlockStmt\n";
+
+        for(const auto& stmt : b->statements)
+        {
+            printAST(
+                stmt.get(),
+                depth + 1
+            );
+        }
+    }
+    else if(auto i = dynamic_cast<const IfStmt*>(node))
+    {
+        indent(depth);
+        cout << "IfStmt\n";
+
+        indent(depth + 1);
+        cout << "Condition\n";
+
+        printAST(
+            i->condition.get(),
+            depth + 2
+        );
+
+        indent(depth + 1);
+        cout << "Then\n";
+
+        printAST(
+            i->thenBranch.get(),
+            depth + 2
+        );
+
+        if(i->elseBranch)
+        {
+            indent(depth + 1);
+            cout << "Else\n";
+
+            printAST(
+                i->elseBranch.get(),
+                depth + 2
+            );
+        }
+    }
+    else
+    {
+        indent(depth);
+        cout << "Unknown Node\n";
+    }
 }

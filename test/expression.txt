@@ -89,3 +89,10 @@ x = add(max(1,2), add(3,4));
 return x+y;
 
 return 11+8;
+x==3;
+
+if(x==3)
+{
+    x=x+1;
+}
+else{x=x-1;}

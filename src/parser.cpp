@@ -353,7 +353,7 @@ unique_ptr<ExprNode> Parser::parseExpression(bool stopAtRightParen)
 unique_ptr<StmtNode> Parser::parseIf()
 {
     consume(LeftParen,"Expected ( to start condition ");
-    auto condition = parseExpression();
+    auto condition = parseExpression(true);
     consume(RightParen,"Expected ) to end condition ");
 
     auto body = parseStatement();
