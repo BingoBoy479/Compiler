@@ -94,6 +94,21 @@ void printAST(const AstNode* node, int depth)
             );
         }
     }
+    else if(auto i = dynamic_cast<const WhileStmt*>(node))
+    {
+        indent(depth);
+        cout<< "WhileStmt\n";
+
+        indent(depth+1);
+        cout<< "Condition\n";
+
+        printAST(i->condition.get(),depth+2);
+        indent(depth+1);
+        cout <<"Body\n";
+
+        printAST(i->body.get(),depth+2);
+
+    }
     else if(auto i = dynamic_cast<const IfStmt*>(node))
     {
         indent(depth);

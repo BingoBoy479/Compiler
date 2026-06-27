@@ -368,7 +368,18 @@ unique_ptr<StmtNode> Parser::parseIf()
 
     return node;
 };
+unique_ptr<WhileStmt> Parser::parseWhile()
+{
+    consume(LeftParen,"Expected ( to start condition ");
+    auto condition = parseExpression(true);
+    consume(RightParen,"Expected ) to end condition ");
 
+    auto body = parseStatement();
+    auto node = std::make_unique<WhileStmt>();
+    node->condition = move(condition);
+    node->body = std::move(body);
+    return node;
+}
 unique_ptr<StmtNode> Parser::parseStatement()
 {
     if(match(KwReturn))
@@ -383,6 +394,10 @@ unique_ptr<StmtNode> Parser::parseStatement()
     else if(match(KwIf))
     {
         return parseIf();
+    }
+    else if(match(KwWhile))
+    {
+        return parseWhile();
     }
     else if (match(LeftBrace))
     {
