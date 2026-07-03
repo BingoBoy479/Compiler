@@ -101,3 +101,6 @@ while(x==3)
 {
     return x+4;
 }
+
+int x;
+int y = 5+x; 

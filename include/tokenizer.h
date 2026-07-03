@@ -16,7 +16,12 @@ enum TokenType
     KwWhile,
     KwFor,
     KwReturn,
+    
+    KwTypeBegin,
+    
     KwInt,
+
+    KwTypeEnd,
 
     Plus,
     Increase,

@@ -57,6 +57,11 @@ const Token& Parser::consume(
     throw std::runtime_error(message);
 };
 
+bool isType(TokenType type)
+{
+    return (type>TokenType::KwTypeBegin) && (type<TokenType::KwTypeEnd);
+}
+
 int precedence (const TokenType& type)
 {
     switch(type)
@@ -368,6 +373,36 @@ unique_ptr<StmtNode> Parser::parseIf()
 
     return node;
 };
+unique_ptr<VarDecl> Parser::parseVarDecl()
+{
+    auto node = std::make_unique<VarDecl>();
+
+    Token type = advance();      // Consume the type token
+    Token name = consume(
+        Word,
+        "Expected variable name"
+    );
+
+    node->type = type;
+    node->name = name;
+
+    if(match(Assign))
+    {
+        node->initializer = parseExpression();
+    }
+
+    consume(
+        Semicolon,
+        "Expected ';' after variable declaration"
+    );
+
+    return node;
+}
+// unique_ptr<ForStmt> parseFor()
+// {
+//     auto node = make_unique<ForStmt>();
+    
+// }
 unique_ptr<WhileStmt> Parser::parseWhile()
 {
     consume(LeftParen,"Expected ( to start condition ");
@@ -375,9 +410,9 @@ unique_ptr<WhileStmt> Parser::parseWhile()
     consume(RightParen,"Expected ) to end condition ");
 
     auto body = parseStatement();
-    auto node = std::make_unique<WhileStmt>();
+    auto node = make_unique<WhileStmt>();
     node->condition = move(condition);
-    node->body = std::move(body);
+    node->body = move(body);
     return node;
 }
 unique_ptr<StmtNode> Parser::parseStatement()
@@ -399,6 +434,16 @@ unique_ptr<StmtNode> Parser::parseStatement()
     {
         return parseWhile();
     }
+    else if(isType(peek().name))
+    {
+        return std::make_unique<DeclStmt>(
+            parseVarDecl()
+        );
+    }
+    // else if (check(KwFunction))
+    // {
+    //     return parseFuncDecl();
+    // }
     else if (match(LeftBrace))
     {
         auto block =

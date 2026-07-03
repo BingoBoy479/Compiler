@@ -141,6 +141,38 @@ void printAST(const AstNode* node, int depth)
             );
         }
     }
+    else if(auto d = dynamic_cast<const DeclStmt*>(node))
+    {
+        indent(depth);
+        cout << "DeclStmt\n";
+
+        printAST(
+            d->declaration.get(),
+            depth + 1
+        );
+    }
+    else if(auto v = dynamic_cast<const VarDecl*>(node))
+    {
+        indent(depth);
+        cout << "VarDecl\n";
+
+        indent(depth + 1);
+        cout << "Type\n";
+
+        indent(depth + 1);
+        cout << "Variable\n";
+
+        if(v->initializer)
+        {
+            indent(depth + 1);
+            cout << "Initializer\n";
+
+            printAST(
+                v->initializer.get(),
+                depth + 2
+            );
+        }
+    }
     else
     {
         indent(depth);
