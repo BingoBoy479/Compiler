@@ -398,7 +398,7 @@ unique_ptr<VarDecl> Parser::parseVarDecl()
 
     return node;
 }
-// unique_ptr<ForStmt> parseFor()
+// unique_ptr<ForStmt> Parser::parseFor()
 // {
 //     auto node = make_unique<ForStmt>();
     
