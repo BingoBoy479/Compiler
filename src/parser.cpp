@@ -398,11 +398,70 @@ unique_ptr<VarDecl> Parser::parseVarDecl()
 
     return node;
 }
-// unique_ptr<ForStmt> Parser::parseFor()
-// {
-//     auto node = make_unique<ForStmt>();
-    
-// }
+unique_ptr<ForStmt> Parser::parseFor()
+{
+    auto node = make_unique<ForStmt>();
+    consume(LeftParen,"Expected ( to start condition ");
+    if(!check(Semicolon))
+    {
+        if(isType(peek().name))
+        {
+            node->initializer =
+                std::make_unique<DeclStmt>(
+                    parseVarDecl()
+                );
+        }
+        else
+        {
+            auto expr = parseExpression();
+
+            consume(
+                Semicolon,
+                "Expected ';' after initializer"
+            );
+
+            node->initializer =
+                std::make_unique<ExprStmt>(
+                    std::move(expr)
+                );
+        }
+    }
+    else
+    {
+        consume(
+            Semicolon,
+            "Expected ';'"
+        );
+    }
+
+    // condition
+    if(!check(Semicolon))
+    {
+        node->condition =
+            parseExpression();
+    }
+
+    consume(
+        Semicolon,
+        "Expected ';' after condition"
+    );
+
+    // increment
+    if(!check(RightParen))
+    {
+        node->increment =
+            parseExpression(true);
+    }
+
+    consume(
+        RightParen,
+        "Expected ')'"
+    );
+
+    node->body = parseStatement();
+
+    return node;   
+}
 unique_ptr<WhileStmt> Parser::parseWhile()
 {
     consume(LeftParen,"Expected ( to start condition ");
@@ -425,6 +484,10 @@ unique_ptr<StmtNode> Parser::parseStatement()
             "Expected ';'"
         );
         return make_unique<ReturnStmt>(move(res));
+    }
+    else if(match(KwFor))
+    {
+        return parseFor();
     }
     else if(match(KwIf))
     {

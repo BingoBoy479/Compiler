@@ -173,6 +173,39 @@ void printAST(const AstNode* node, int depth)
             );
         }
     }
+    else if(auto f = dynamic_cast<const ForStmt*>(node))
+    {
+        indent(depth);
+        cout << "ForStmt\n";
+
+        indent(depth + 1);
+        cout << "Initializer\n";
+        printAST(
+            f->initializer.get(),
+            depth + 2
+        );
+
+        indent(depth + 1);
+        cout << "Condition\n";
+        printAST(
+            f->condition.get(),
+            depth + 2
+        );
+
+        indent(depth + 1);
+        cout << "Increment\n";
+        printAST(
+            f->increment.get(),
+            depth + 2
+        );
+
+        indent(depth + 1);
+        cout << "Body\n";
+        printAST(
+            f->body.get(),
+            depth + 2
+        );
+    }
     else
     {
         indent(depth);
