@@ -27,7 +27,7 @@ public:
     std::unique_ptr<ExprNode> parseExpression(bool stopAtRightParen = false);
     std::unique_ptr<StmtNode> parseStatement();
 
-    std::unique_ptr<DeclNode> parseDeclaration();
+    std::unique_ptr<FunctionDecl> parseFunctionDecl();
     std::unique_ptr<Program> parseProgram();
 
 private:
@@ -49,6 +49,7 @@ private:
     std::unique_ptr<WhileStmt> parseWhile();
     std::unique_ptr<ExprNode> parseCallExpression();
     std::unique_ptr<StmtNode> parseIf();  
-
+    std::unique_ptr<ParameterDecl> parseParameter();
+    std::unique_ptr<BlockStmt> parseBlock();
 
 };

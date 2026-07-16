@@ -216,8 +216,18 @@ public:
     Token type;
     Token name;
 
-    std::unique_ptr<ExprNode>
-        defaultValue;
+    std::unique_ptr<ExprNode> defaultValue;
+
+    ParameterDecl(
+        Token type,
+        Token name,
+        std::unique_ptr<ExprNode> defaultValue = nullptr
+    )
+        : type(type),
+          name(name),
+          defaultValue(std::move(defaultValue))
+    {
+    }
 };
 
 class VarDecl : public DeclNode

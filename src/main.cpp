@@ -52,11 +52,8 @@ int main(int argc, char* argv[])
     printTokens(tokens,source);
     Parser parser(tokens, source);
 
-    while(!parser.isAtEnd())
-    {
-        auto expr = parser.parseStatement();
+    auto program = parser.parseProgram();
 
-        printAST(expr.get());
-    }
+    printAST(program.get());
     return 0;
 }

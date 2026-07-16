@@ -242,7 +242,18 @@ Parser::parseCallExpression()
         move(arguments)
     );
 }
+bool hasLeftParen(stack<TokenType> ops)
+{
+    while(!ops.empty())
+    {
+        if(ops.top() == LeftParen)
+            return true;
 
+        ops.pop();
+    }
+
+    return false;
+}
 unique_ptr<ExprNode> Parser::parseExpression(bool stopAtRightParen)
 {
     stack<unique_ptr<ExprNode>> operands ;
@@ -299,12 +310,18 @@ unique_ptr<ExprNode> Parser::parseExpression(bool stopAtRightParen)
             }
             else if(op == RightParen)
             {
-                if(stopAtRightParen) break;
-                while(!operators.empty() && operators.top()!=LeftParen)
+                if(stopAtRightParen && !hasLeftParen(operators))
+                    break;
+
+                while(!operators.empty() &&
+                    operators.top() != LeftParen)
                 {
-                    collapse(operators,operands);
+                    collapse(operators, operands);
                 }
-                if(operators.empty()) throw runtime_error("Invalid Parenthese");
+
+                if(operators.empty())
+                    throw runtime_error("Invalid Parentheses");
+
                 popOperator(operators);
                 advance();
             }
@@ -395,6 +412,100 @@ unique_ptr<VarDecl> Parser::parseVarDecl()
         Semicolon,
         "Expected ';' after variable declaration"
     );
+
+    return node;
+}
+std::unique_ptr<BlockStmt> Parser::parseBlock()
+{
+    consume(LeftBrace, "Expected '{'");
+
+    auto block = std::make_unique<BlockStmt>();
+
+    while(!check(RightBrace))
+    {
+        if(isAtEnd())
+        throw runtime_error(
+            "Expected '}'"
+        );
+        block->statements.push_back(
+            parseStatement()
+        );
+    }
+
+    consume(RightBrace, "Expected '}'");
+
+    return block;
+}
+std::unique_ptr<ParameterDecl> Parser::parseParameter()
+{
+    if(!isType(peek().name))
+        throw std::runtime_error("Expected parameter type");
+
+    Token type = advance();
+
+    Token name = consume(
+        Word,
+        "Expected parameter name"
+    );
+
+    std::unique_ptr<ExprNode> defaultValue;
+
+    // Optional: only if your language supports it
+    if(match(Assign))
+    {
+        defaultValue = parseExpression();
+    }
+
+    return std::make_unique<ParameterDecl>(
+        type,
+        name,
+        std::move(defaultValue)
+    );
+}
+std::unique_ptr<FunctionDecl> Parser::parseFunctionDecl()
+{
+    auto node = std::make_unique<FunctionDecl>();
+
+    consume(
+        KwFunction,
+        "Expected 'function'"
+    );
+
+    if(!isType(peek().name))
+    {
+        throw std::runtime_error(
+            "Expected return type"
+        );
+    }
+
+    node->returnType = advance();
+
+    node->functionName = consume(
+        Word,
+        "Expected function name"
+    );
+
+    consume(
+        LeftParen,
+        "Expected '(' after function name"
+    );
+
+    if(!check(RightParen))
+    {
+        do
+        {
+            node->parameters.push_back(
+                parseParameter()
+            );
+        }
+        while(match(Comma));
+    }
+
+    consume(
+        RightParen,
+        "Expected ')'"
+    );
+    node->body = parseBlock();
 
     return node;
 }
@@ -503,22 +614,9 @@ unique_ptr<StmtNode> Parser::parseStatement()
             parseVarDecl()
         );
     }
-    // else if (check(KwFunction))
-    // {
-    //     return parseFuncDecl();
-    // }
-    else if (match(LeftBrace))
+    else if(check(LeftBrace))
     {
-        auto block =
-        std::make_unique<BlockStmt>();
-
-        while(!check(RightBrace) && !isAtEnd())
-        {
-            block->statements.push_back( parseStatement() );
-        }
-        consume(RightBrace,"Expected '}' ");
-
-        return block;
+        return parseBlock();
     }
     else
     {
@@ -530,4 +628,38 @@ unique_ptr<StmtNode> Parser::parseStatement()
         return make_unique<ExprStmt>(move(res));
     }
 
+}
+std::unique_ptr<Program> Parser::parseProgram()
+{
+    auto node = std::make_unique<Program>();
+
+    while(!check(KwStart))
+    {
+        if(isAtEnd())
+        {
+            throw std::runtime_error(
+                "Expected start block"
+            );
+        }
+
+        node->functions.push_back(
+            parseFunctionDecl()
+        );
+    }
+
+    consume(
+        KwStart,
+        "Expected 'start'"
+    );
+
+    node->startBlock = parseBlock();
+
+    if(!isAtEnd())
+    {
+        throw std::runtime_error(
+            "Unexpected tokens after program"
+        );
+    }
+
+    return node;
 }

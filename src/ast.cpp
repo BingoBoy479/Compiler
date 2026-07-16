@@ -206,6 +206,74 @@ void printAST(const AstNode* node, int depth)
             depth + 2
         );
     }
+    else if(auto parameter = dynamic_cast<const ParameterDecl*>(node))
+{
+    indent(depth);
+    cout << "Parameter\n";
+
+    indent(depth + 1);
+    cout << "Type\n";
+
+    indent(depth + 1);
+    cout << "Variable\n";
+
+    if(parameter->defaultValue)
+    {
+        indent(depth + 1);
+        cout << "Default\n";
+
+        printAST(parameter->defaultValue.get(), depth + 2);
+    }
+}
+    else if(auto f = dynamic_cast<const FunctionDecl*>(node))
+{
+    indent(depth);
+    cout << "FunctionDecl\n";
+
+    indent(depth + 1);
+    cout << "Parameters\n";
+
+    for(const auto& p : f->parameters)
+    {
+        printAST(
+            p.get(),
+            depth + 2
+        );
+    }
+
+    indent(depth + 1);
+    cout << "Body\n";
+
+    printAST(
+        f->body.get(),
+        depth + 2
+    );
+}
+    else if(auto p = dynamic_cast<const Program*>(node))
+{
+    indent(depth);
+    cout << "Program\n";
+
+    indent(depth + 1);
+    cout << "Functions\n";
+
+    for(const auto& f : p->functions)
+    {
+        printAST(
+            f.get(),
+            depth + 2
+        );
+    }
+
+    indent(depth + 1);
+    cout << "Start\n";
+
+    printAST(
+        p->startBlock.get(),
+        depth + 2
+    );
+}
+
     else
     {
         indent(depth);
